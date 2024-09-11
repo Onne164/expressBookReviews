@@ -13,10 +13,10 @@ public_users.post("/register", (req, res) => {
   //     return res.status(400).json({ message: "Username and password are required" });
   // }
 
-  // // Check if the username already exists
+ /*  // // Check if the username already exists
   // if (!isValid(username)) {
   //     return res.status(409).json({ message: "Username already exists" });
-  // }
+  // } */
 
   // Register the new user
   users.push({ username, password });
