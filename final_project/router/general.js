@@ -1,5 +1,5 @@
 const express = require('express');
-const axios = require('axios'); 
+const axios = require('axios');
 let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
@@ -9,17 +9,14 @@ const public_users = express.Router();
 public_users.post("/register", (req, res) => {
   const { username, password } = req.body;
 
-  // Check if both username and password are provided
   if (!username || !password) {
     return res.status(400).json({ message: "Username and password are required" });
   }
 
-  // Check if the username already exists
   if (!isValid(username)) {
     return res.status(409).json({ message: "Username already exists" });
   }
 
-  // Register the new user
   users.push({ username, password });
   return res.status(201).json({ message: "User successfully registered. Now you can login" });
 });
@@ -29,7 +26,7 @@ public_users.get('/books', (req, res) => {
   return res.status(200).json(books);
 });
 
-// Get the book list available using Promise callbacks with Axios (server request)
+// Get the book list available using async-await with Axios (server request)
 public_users.get("/server/asynbooks", async function (req, res) {
   try {
     let response = await axios.get("http://localhost:5000/books");  
@@ -41,7 +38,7 @@ public_users.get("/server/asynbooks", async function (req, res) {
   }
 });
 
-// Get book details based on ISBN
+// Get book details based on ISBN (local data)
 public_users.get('/isbn/:isbn', (req, res) => {
   const isbn = req.params.isbn;
   const book = books[isbn];
@@ -50,6 +47,33 @@ public_users.get('/isbn/:isbn', (req, res) => {
     return res.status(200).json(book);
   } else {
     return res.status(404).json({ message: "Book not found" });
+  }
+});
+
+// Get book details based on ISBN using Promise callbacks with Axios
+public_users.get("/server/isbn/:isbn", (req, res) => {
+  const isbn = req.params.isbn;
+
+  axios.get(`http://localhost:5000/books/${isbn}`)  
+    .then(response => {
+      return res.status(200).json(response.data);
+    })
+    .catch(error => {
+      console.error(error);
+      return res.status(500).json({ message: "Error retrieving book details" });
+    });
+});
+
+// Get book details based on ISBN using async-await with Axios
+public_users.get("/async/isbn/:isbn", async (req, res) => {
+  const isbn = req.params.isbn;
+
+  try {
+    let response = await axios.get(`http://localhost:5000/books/${isbn}`);  
+    return res.status(200).json(response.data);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error retrieving book details" });
   }
 });
 
