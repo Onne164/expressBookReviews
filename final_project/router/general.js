@@ -25,7 +25,7 @@ public_users.post("/register", (req, res) => {
 
 
 // Get the book list available in the shop
-public_users.get('/books', (req, res) => {
+public_users.get('/books', (req, res) => {delete
   res.status(200).json(books);
 });
 
