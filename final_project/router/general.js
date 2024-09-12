@@ -1,32 +1,44 @@
 const express = require('express');
+const axios = require('axios'); 
 let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
-
+// Register a new user
 public_users.post("/register", (req, res) => {
   const { username, password } = req.body;
 
   // Check if both username and password are provided
-  // if (!username || !password) {
-  //     return res.status(400).json({ message: "Username and password are required" });
-  // }
+  if (!username || !password) {
+    return res.status(400).json({ message: "Username and password are required" });
+  }
 
- /*  // // Check if the username already exists
-  // if (!isValid(username)) {
-  //     return res.status(409).json({ message: "Username already exists" });
-  // } */
+  // Check if the username already exists
+  if (!isValid(username)) {
+    return res.status(409).json({ message: "Username already exists" });
+  }
 
   // Register the new user
   users.push({ username, password });
   return res.status(201).json({ message: "User successfully registered. Now you can login" });
 });
 
+// Get the book list available in the shop (local data)
+public_users.get('/books', (req, res) => {
+  return res.status(200).json(books);
+});
 
-// Get the book list available in the shop
-public_users.get('/books', (req, res) => {delete
-  res.status(200).json(books);
+// Get the book list available using Promise callbacks with Axios (server request)
+public_users.get("/server/asynbooks", async function (req, res) {
+  try {
+    let response = await axios.get("http://localhost:5000/books");  
+    console.log(response.data);
+    return res.status(200).json(response.data);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error getting book list" });
+  }
 });
 
 // Get book details based on ISBN
@@ -40,7 +52,7 @@ public_users.get('/isbn/:isbn', (req, res) => {
     return res.status(404).json({ message: "Book not found" });
   }
 });
-  
+
 // Get book details based on author
 public_users.get('/author/:author', (req, res) => {
   const author = req.params.author;
@@ -65,7 +77,7 @@ public_users.get('/title/:title', (req, res) => {
   }
 });
 
-//  Get book review
+// Get book reviews based on ISBN
 public_users.get('/review/:isbn', (req, res) => {
   const isbn = req.params.isbn;
   const book = books[isbn];
