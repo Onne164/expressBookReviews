@@ -54,18 +54,19 @@ public_users.get('/isbn/:isbn', (req, res) => {
 public_users.get("/server/isbn/:isbn", (req, res) => {
   const isbn = req.params.isbn;
 
-  axios.get(`http://localhost:5000/books/${isbn}`)  
+  axios.get(`http://localhost:5000/isbn/${isbn}`)
     .then(response => {
       return res.status(200).json(response.data);
     })
     .catch(error => {
-      console.error(error);
+      console.error("Error retrieving book details:", error.message); 
       return res.status(500).json({ message: "Error retrieving book details" });
     });
 });
 
+
 // Get book details based on ISBN using async-await with Axios
-public_users.get("/async/isbn/:isbn", async (req, res) => {
+/* public_users.get("/async/isbn/:isbn", async (req, res) => {
   const isbn = req.params.isbn;
 
   try {
@@ -75,7 +76,7 @@ public_users.get("/async/isbn/:isbn", async (req, res) => {
     console.error(error);
     return res.status(500).json({ message: "Error retrieving book details" });
   }
-});
+}); */
 
 // Get book details based on author
 public_users.get('/author/:author', (req, res) => {
@@ -89,8 +90,8 @@ public_users.get('/author/:author', (req, res) => {
   }
 });
  
-// Get book details based on author using async-await with Axios
-public_users.get("/async/author/:author", async (req, res) => {
+// Get book details based on author using Promise callbacks with Axios
+public_users.get("/server/author/:author", async (req, res) => {
   const author = req.params.author;
 
   try {
@@ -115,8 +116,8 @@ public_users.get('/title/:title', (req, res) => {
   }
 });
 
-// Get book details based on title using async-await with Axios
-public_users.get("/async/title/:title", async (req, res) => {
+// Get book details based on title using using Promise callbacks with Axios
+public_users.get("/server/title/:title", async (req, res) => {
   const title = req.params.title;
 
   try {
